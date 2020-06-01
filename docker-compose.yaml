@@ -1,0 +1,116 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb:10.1
+    restart: always
+    volumes:
+      - ${LOCAL_DB_DIR}:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_LOG_CONSOLE=true
+    ports:
+      # So that the host can access the database, also backup the database
+      - 13306:3306
+    networks:
+      - seafile-net
+    env_file:
+      - .env
+
+  memcached:
+    image: memcached:1.5.6
+    restart: always
+    entrypoint: memcached -m 256
+    networks:
+      - seafile-net
+
+  seafile:
+    image: seafileltd/seafile-mc:latest
+    restart: always
+    volumes:
+      - ${LOCAL_SEAFILE_DATA_DIR}:/shared
+    environment:
+      - DB_HOST=db
+      # Note, this is not DB_ROOT_PASSWORD, it is DB_ROOT_PASSWD.
+      - DB_ROOT_PASSWD=${MYSQL_ROOT_PASSWORD}
+      - TIME_ZONE=US/Eastern
+      # We shall have another separated Reverse Proxy Container to handle HTTPS
+      - SEAFILE_SERVER_LETSENCRYPT=false
+      # - SEAFILE_SERVER_HOSTNAME=${MY_SEAFILE_VIRTUAL_HOST}
+      - SEAFILE_ADMIN_EMAIL=${MY_SEAFILE_ADMIN_EMAIL}
+      - SEAFILE_ADMIN_PASSWORD=${MY_SEAFILE_ADMIN_PASSWORD}
+      # For Nginx reverse proxy use
+      - VIRTUAL_HOST=${MY_SEAFILE_VIRTUAL_HOST}
+      # For letsencrypt-companion use
+      - LETSENCRYPT_HOST=${MY_SEAFILE_VIRTUAL_HOST}
+      - LETSENCRYPT_EMAIL=${MY_SEAFILE_ADMIN_EMAIL}
+    ports:
+      # TO access the interface through HTTP, bypass the Nginx Reverse Proxy
+      - 10080:80
+      # 8080 for WebDAV
+      # On Host machine: ${LOCAL_SEAFILE_DATA_DIR}/seafile/conf/seafdav.conf
+      # [WEBDAV]
+      # enbled = true
+      # port = 8080
+      # fastcgi = false
+      # shared_name = /seafileDAV
+      - 18080:8080
+
+    depends_on:
+      - db
+      - memcached
+      - letsencrypt-companion
+      - proxy
+    networks:
+      - seafile-net
+      - proxy-net
+    env_file:
+      - .env
+
+  proxy:
+    build: ./proxy
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    volumes:
+      - certs:/etc/nginx/certs:ro
+      - vhost.d:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - proxy-net
+
+
+  letsencrypt-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes:
+      - certs:/etc/nginx/certs
+      - vhost.d:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - proxy
+    networks:
+      - proxy-net
+
+  duckdns:
+    image: linuxserver/duckdns
+    restart: always
+    environment:
+      - SUBDOMAINS=${DUCKDNS_SUBDOMAINS}
+      - TOKEN=${DUCKDNS_TOKEN}
+    env_file:
+      - .env
+
+volumes:
+  certs:
+  vhost.d:
+  html:
+
+networks:
+  seafile-net:
+  proxy-net:
