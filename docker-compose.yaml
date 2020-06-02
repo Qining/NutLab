@@ -25,7 +25,7 @@ services:
       - seafile-net
 
   seafile:
-    image: seafileltd/seafile-mc:latest
+    image: seafileltd/seafile-mc:7.1.4
     restart: always
     volumes:
       - ${LOCAL_SEAFILE_DATA_DIR}:/shared
