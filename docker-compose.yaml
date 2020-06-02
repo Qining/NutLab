@@ -1,13 +1,13 @@
 version: '3'
 
 services:
-  db:
+  seafile_db:
     image: mariadb:10.1
     restart: always
     volumes:
-      - ${LOCAL_DB_DIR}:/var/lib/mysql
+      - ${LOCAL_SEAFILE_DB_DIR}:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${SEAFILE_DB_ROOT_PASSWORD}
       - MYSQL_LOG_CONSOLE=true
     ports:
       # So that the host can access the database, also backup the database
@@ -29,14 +29,15 @@ services:
     restart: always
     volumes:
       - ${LOCAL_SEAFILE_DATA_DIR}:/shared
+      - ./seafile/seafile.nginx.conf.template:/templates/seafile.nginx.conf.template:ro
     environment:
-      - DB_HOST=db
-      # Note, this is not DB_ROOT_PASSWORD, it is DB_ROOT_PASSWD.
-      - DB_ROOT_PASSWD=${MYSQL_ROOT_PASSWORD}
+      - DB_HOST=seafile_db
+      # Note, this is not _DB_ROOT_PASSWORD, it is _DB_ROOT_PASSWD.
+      - DB_ROOT_PASSWD=${SEAFILE_DB_ROOT_PASSWORD}
       - TIME_ZONE=US/Eastern
       # We shall have another separated Reverse Proxy Container to handle HTTPS
       - SEAFILE_SERVER_LETSENCRYPT=false
-      # - SEAFILE_SERVER_HOSTNAME=${MY_SEAFILE_VIRTUAL_HOST}
+      - SEAFILE_SERVER_HOSTNAME=${MY_SEAFILE_VIRTUAL_HOST}
       - SEAFILE_ADMIN_EMAIL=${MY_SEAFILE_ADMIN_EMAIL}
       - SEAFILE_ADMIN_PASSWORD=${MY_SEAFILE_ADMIN_PASSWORD}
       # For Nginx reverse proxy use
@@ -57,7 +58,7 @@ services:
       - 18080:8080
 
     depends_on:
-      - db
+      - seafile_db
       - memcached
       - letsencrypt-companion
       - proxy
