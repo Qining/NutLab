@@ -9,8 +9,8 @@ trap 'echo Ctrl-c, ${me} interrupted; exit' INT
 echo "${me} -- Start"
 
 # basic
-sudo apt update
-sudo apt install -y curl
+sudo apt-get update
+sudo apt-get install -y curl git wget gnupg2
 
 if [ -f $HOME/.inputrc ]; then
 	echo -e "\n$include ${SCRIPT_DIR}/ubuntu_inputrc" >> $HOME/.inputrc
@@ -21,14 +21,14 @@ fi
 exe bind -f $HOME/.inputrc
 
 # docker
-sudo apt -y install docker.io
+sudo apt-get -y install docker.io
 exe sudo groupadd docker
 exe sudo usermod -aG docker $USER
 exe sudo systemctl start docker
 exe sudo systemctl enable docker
 
 # tmux
-sudo apt -y install tmux xsel
+sudo apt-get -y install tmux xsel
 if [ -d $HOME/.tmux/plugins/tpm ]; then
 	rm -rf $HOME/.tmux/plugins/tpm
 fi
@@ -38,7 +38,7 @@ exe git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
 exe cp $SCRIPT_DIR/tmux.conf $HOME/.tmux.conf
 
 # vim
-sudo apt -y install vim
+sudo apt-get -y install vim
 exe git config --global core.editor.vim
 if [ ! -d $HOME/.vim/autoload ]; then
 	exe mkdir -p $HOME/.vim/autoload
@@ -54,5 +54,5 @@ echo | echo | vim +PlugInstall +qall &>/dev/null
 # nordvpn
 exe wget -qnc https://repo.nordvpn.com/deb/nordvpn/debian/pool/main/nordvpn-release_1.0.0_all.deb -P /tmp
 sudo dpkg -i /tmp/nordvpn-release_1.0.0_all.deb
-sudo apt update
-sudo apt install nordvpn
+sudo apt-get update
+sudo apt-get -y install nordvpn
