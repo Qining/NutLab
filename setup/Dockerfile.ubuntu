@@ -1,0 +1,7 @@
+FROM ubuntu
+
+COPY . /root/setup
+WORKDIR /root/setup
+RUN /root/setup/setup_ubuntu.sh
+
+CMD ["/root/setup/test.sh"]
