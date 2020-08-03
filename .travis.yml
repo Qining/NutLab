@@ -7,5 +7,5 @@ services:
   - docker
 
 script:
-  - docker build -t setup:ubuntu -f ./setup/Dockerfile.ubuntu
+  - docker build -t setup:ubuntu -f ./setup/Dockerfile.ubuntu ./setup
   - docker run --rm setup:ubuntu
