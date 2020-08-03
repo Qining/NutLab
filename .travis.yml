@@ -1,0 +1,11 @@
+sudo: required
+dist: trusty
+os:
+  - linux
+
+services:
+  - docker
+
+script:
+  - docker build -t setup:ubuntu -f ./setup/Dockerfile.ubuntu
+  - docker run --rm setup:ubuntu
