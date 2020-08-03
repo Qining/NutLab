@@ -2,7 +2,8 @@
 
 exe() { echo "\$ $@"; "$@"; }
 
-SCRIPT_DIR="$( cd "$( dirname "${BASE_SOURCE[0]}" )" && pwd)"
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+echo ${SCRIPT_DIR}
 me=`basename "$0"`
 trap 'echo Ctrl-c, ${me} interrupted; exit' INT
 echo "${me} -- Start"
@@ -12,19 +13,19 @@ sudo apt update
 sudo apt install -y curl
 
 if [ -f $HOME/.inputrc ]; then
-	echo "$include ${SCRIPT_DIR}/ubuntu_inputrc" >> $HOME/.inputrc
+	echo -e "\n$include ${SCRIPT_DIR}/ubuntu_inputrc" >> $HOME/.inputrc
 else
 	cp ${SCRIPT_DIR}/ubuntu_inputrc $HOME/.inputrc
 fi
 
-exec bind -f $HOME/.inputrc
+exe bind -f $HOME/.inputrc
 
 # docker
 sudo apt -y install docker.io
 exe sudo groupadd docker
 exe sudo usermod -aG docker $USER
 exe sudo systemctl start docker
-exe sude systemctl enable docker
+exe sudo systemctl enable docker
 
 # tmux
 sudo apt -y install tmux xsel
