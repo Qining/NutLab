@@ -1,0 +1,18 @@
+# To reload .inputrc without re-login, use:
+# bind -f ~/.inputrc
+# or press ctrl-x then ctrl-r
+
+# load system wide settings first
+$include /etc/inputrc
+
+# case insensitive tab completion
+set completion-ignore-case on
+
+# show symlinked directories a little bit different
+set mark-symlinked-directories on
+
+# show all candidates directly
+set show-all-if-ambiguous on
+
+# do not modify history
+set revert-all-at-newline on
