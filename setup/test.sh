@@ -10,7 +10,7 @@ echo -e \
   ## Checking ##
   ##############
   "
-exe docker run hello-world && \
+exe docker version && \
 exe tmux -V && \
 exe nordvpn --version && \
 
