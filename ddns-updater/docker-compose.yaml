@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  ddns-updater:
+    image: qmcgaw/ddns-updater
+    container_name: ddns-updater
+    restart: always
+    volumes:
+      - ./data:/updater/data
+    environment:
+      - CONFIG=
+      - PERIOD=5m
+      - IP_METHOD=cycle
+      - IPV4_METHOD=cycle
+      - IPV6_METHOD=cycle
+      - HTTP_TIMEOUT=10s
+      # Web UI
+      - LISTENING_PORT=8000
+      - ROOT_URL=/
+      # Backup
+      - BACKUP_PERIOD=0
+      - BACKUP_DIRECTORY=/updater/data
+      # Other
+      - LOG_ENCODING=console
+      - LOG_LEVEL=info
+      - NODE_ID=-1
+      - GOTIFY_URL=
+      - GOTIFY_TOKEN=
+    ports:
+      - 8000:8000/tcp

@@ -1,6 +1,6 @@
 # Seafile by Docker Compose
 
-## Works with Nginx Proxy
+## Modify the built-in Nginx Proxy
 
 The file *seafile.nginx.conf.template* in the seafile folder is supposed to
 overwrite the default *seafile.nginx.conf.template* to support the Seafile

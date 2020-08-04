@@ -56,3 +56,12 @@ exe wget -qnc https://repo.nordvpn.com/deb/nordvpn/debian/pool/main/nordvpn-rele
 sudo dpkg -i /tmp/nordvpn-release_1.0.0_all.deb
 sudo apt-get update
 sudo apt-get -y install nordvpn
+
+# post setup steps
+echo -e \
+  "
+  ######################
+  ## Post setup steps ##
+  ######################
+  1. Install Tmux plugins by <prefix>+I in tmux session
+  "
