@@ -26,6 +26,7 @@ services:
 
   elasticsearch:
     image: seafileltd/elasticsearch-with-ik:5.6.16
+    restart: always
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
@@ -42,6 +43,7 @@ services:
 
   onlyoffice:
     image: onlyoffice/documentserver
+    restart: always
     mem_limit: 1536m
     ports:
       # So that we can check whether the service is ready by
