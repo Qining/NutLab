@@ -1,4 +1,4 @@
-# NutLab
+# Playground
 
 ## [Setup](setup)
 [![ubuntu_setup](https://travis-ci.org/Qining/HomeLab.svg)](https://travis-ci.org/Qining/HomeLab "ubuntu_setup")
