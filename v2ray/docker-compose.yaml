@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  v2ray:
+    image: v2ray/official
+    restart: always
+    volumes:
+      - ${V2RAY_CONFIG}:/etc/v2ray/config.json:ro
+      - ${V2RAY_LOG}:/var/log/v2ray
+    ports:
+      - 127.0.0.1:9001:9001
+      - 127.0.0.1:9001:9001/udp
+    env_file:
+      - .env
+
+  mock:
+    image: dockersamples/static-site
+    ports:
+      - 8080:80
