@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  aria2:
+    image: p3terx/aria2-pro
+    logging:
+      options:
+        max-size: 2m
+    ports:
+      - 6800:6800
+      - 6888:6888
+      - 6888:6888/udp
+    env_file:
+      - .env
+    environment:
+      - PUID=${CLOUDREVE_PUID}
+      - PGID=${CLOUDREVE_PGID}
+      - RPC_SECRET=${ARIA2_RPC_SECRET}
+    volumes:
+      - ${ARIA_CONFIG_DIR}:/config
+      - ${TEMP_DOWNLOAD_DIR}:/downloads
+    networks:
+      - cloudreve-network
+    restart: unless-stopped
+
+  cloudreve:
+    build: ./cloudreve
+    ports:
+      - 5212:5212
+      - 5212:5212/udp
+    env_file:
+      - .env
+    environment:
+      - PUID=${CLOUDREVE_PUID}
+      - PGID=${CLOUDREVE_PGID}
+    volumes:
+      - ${TEMP_DOWNLOAD_DIR}:/downloads
+      # - ${CLOUDREVE_DATA_DIR}:/cloudreve
+      - ${CLOUDREVE_UPLOAD_DIR}:/cloudreve/uploads
+      - ${CLOUDREVE_CONF_INI_FILE}:/cloudreve/conf.ini
+      - ${CLOUDREVE_DB_FILE}:/cloudreve/cloudreve.db
+    networks:
+      - cloudreve-network
+    restart: unless-stopped
+
+networks:
+  cloudreve-network:
