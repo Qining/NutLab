@@ -10,7 +10,7 @@ echo "${me} -- Start"
 
 # basic
 sudo apt-get update
-sudo apt-get install -y curl git wget gnupg2 net-tools certbot python3-certbot-nginx sysstat
+sudo apt-get install -y curl git wget gnupg2 net-tools certbot python3-certbot-nginx sysstat iotop
 
 if [ -f $HOME/.inputrc ]; then
 	echo -e "\n$include ${SCRIPT_DIR}/ubuntu_inputrc" >> $HOME/.inputrc
