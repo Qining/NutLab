@@ -3,6 +3,7 @@ version: '3'
 services:
   aria2:
     image: p3terx/aria2-pro
+    user: 1000:1000
     logging:
       options:
         max-size: 2m
@@ -25,6 +26,7 @@ services:
 
   cloudreve:
     build: ./cloudreve
+    user: 1000:1000
     ports:
       - 5212:5212
       - 5212:5212/udp
