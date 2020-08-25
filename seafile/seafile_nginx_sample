@@ -10,7 +10,6 @@
 
 # Seafile is supposed to store big files some time.
 client_max_body_size 50G;
-proxy_request_buffering off;
 
 # If we receive X-Forwarded-Proto, pass it through; otherwise, pass along the
 # scheme used to connect to this server
@@ -64,10 +63,10 @@ proxy_set_header Proxy "";
 
 # MODIFY: seafile.example.org
 upstream seafile.example.org {
-            # MODIFY: The real IP and port of your Seafile app
-            server 192.168.0.100:10080;
-                # Cannot connect to network of this container
-                server 127.0.0.1 down;
+  # MODIFY: The real IP and port of your Seafile app
+  server 192.168.0.100:10080;
+  # Cannot connect to network of this container
+  server 127.0.0.1 down;
 }
 
 server {
@@ -77,6 +76,8 @@ server {
   server_name seafile.example.org;
   listen 80;
   access_log /var/log/nginx/access.log vhost;
+  proxy_request_buffering off;
+
   location / {
     # MODIFY: match with the upstream group name
     proxy_pass http://seafile.example.org;
