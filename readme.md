@@ -7,3 +7,6 @@ Helper scripts to setup a VM.
 
 ## [Seafile by Docker Compose](seafile_docker_compose)
 Setup **Seafile** with **Docker Compose**.
+
+## [DDNS Updater](ddns-updater)
+Setup **DDNS updater** with **Docker Compose**.

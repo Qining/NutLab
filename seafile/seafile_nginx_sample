@@ -71,13 +71,14 @@ upstream seafile.example.org {
 }
 
 server {
-  # MODIFY: match with the upstream group name
+  # MODIFY: server name should match with the full domain name.
   # CertBot will be able to find this server and rewrite it to patch SSL
   # support
   server_name seafile.example.org;
   listen 80;
   access_log /var/log/nginx/access.log vhost;
   location / {
+    # MODIFY: match with the upstream group name
     proxy_pass http://seafile.example.org;
   }
 }
