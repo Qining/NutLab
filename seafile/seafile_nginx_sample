@@ -8,9 +8,6 @@
 # This file assumes the SSL certificate will be handled by CertBot with
 # certificates provided by LetsEncrypt.
 
-# Seafile is supposed to store big files some time.
-client_max_body_size 50G;
-
 # If we receive X-Forwarded-Proto, pass it through; otherwise, pass along the
 # scheme used to connect to this server
 map $http_x_forwarded_proto $proxy_x_forwarded_proto {
@@ -49,14 +46,6 @@ access_log off;
 # HTTP 1.1 support
 proxy_http_version 1.1;
 proxy_buffering off;
-proxy_set_header Host $http_host;
-proxy_set_header Upgrade $http_upgrade;
-proxy_set_header Connection $proxy_connection;
-proxy_set_header X-Real-IP $remote_addr;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
-proxy_set_header X-Forwarded-Ssl $proxy_x_forwarded_ssl;
-proxy_set_header X-Forwarded-Port $proxy_x_forwarded_port;
 
 # Mitigate httpoxy attack (see README for details)
 proxy_set_header Proxy "";
@@ -65,6 +54,13 @@ proxy_set_header Proxy "";
 upstream seafile.example.org {
   # MODIFY: The real IP and port of your Seafile app
   server 192.168.0.100:10080;
+  # Cannot connect to network of this container
+  server 127.0.0.1 down;
+}
+
+upstream seafdav.srv {
+  # MODIFY: The real IP and port of your Seafile Webdav (seafdav.conf)
+  server 192.168.0.100:18080;
   # Cannot connect to network of this container
   server 127.0.0.1 down;
 }
@@ -81,7 +77,42 @@ server {
   location / {
     # MODIFY: match with the upstream group name
     proxy_pass http://seafile.example.org;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Host $server_name;
+    proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
+    proxy_set_header X-Forwarded-Ssl $proxy_x_forwarded_ssl;
+    # proxy_set_header Upgrade $http_upgrade;
+    # proxy_set_header Connection $proxy_connection;
+    # proxy_set_header X-Forwarded-Port $proxy_x_forwarded_port;
+
+    proxy_read_timeout 1200s;
+    # Seafile is supposed to store big files some time.
+    client_max_body_size 0;
+    access_log /var/log/nginx/seahub.access.log;
+    error_log /var/log/nginx/seahub.error.log;
   }
+
+  # # Webdav
+  # location /seafdav {
+    # proxy_pass http://seafdav.srv/seafdav;
+    # proxy_set_header Host $http_host;
+    # proxy_set_header X-Real-IP $remote_addr;
+    # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    # proxy_set_header X-Forwarded-Host $server_name;
+    # proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
+    # proxy_set_header X-Forwarded-Ssl $proxy_x_forwarded_ssl;
+    # # proxy_set_header Upgrade $http_upgrade;
+    # # proxy_set_header Connection $proxy_connection;
+    # # proxy_set_header X-Forwarded-Port $proxy_x_forwarded_port;
+
+    # proxy_read_timeout 1200s;
+    # # Seafile is supposed to store big files some time.
+    # client_max_body_size 0;
+    # access_log /var/log/nginx/seafdav.access.log;
+    # error_log /var/log/nginx/seafdav.error.log;
+  # }
 }
 
 # Following is the result of CertBot.
