@@ -10,7 +10,7 @@ echo "${me} -- Start"
 
 # basic
 sudo apt-get update
-sudo apt-get install -y curl git wget gnupg2 net-tools certbot python3-certbot-nginx sysstat iotop
+sudo apt-get install -y curl git wget gnupg2 net-tools certbot python3-certbot-nginx sysstat iotop davfs2
 
 if [ -f $HOME/.inputrc ]; then
 	echo -e "\n$include ${SCRIPT_DIR}/ubuntu_inputrc" >> $HOME/.inputrc
@@ -64,4 +64,5 @@ echo -e \
   ## Post setup steps ##
   ######################
   1. Install Tmux plugins by <prefix>+I in tmux session
+  2. 'use_locks 0' in /etc/davfs2/davfs2.conf to allow Webdav mount
   "

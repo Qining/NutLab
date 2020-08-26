@@ -13,6 +13,7 @@ echo -e \
 exe which docker && \
 exe tmux -V && \
 exe nordvpn --version && \
+exe mount.davfs -V && \
 
 if [ $? -eq 0 ]; then
   echo -e \

@@ -1,5 +1,6 @@
 # Cloudreve with Aria2
 
+## Setup
 [Reference](https://github.com/xavier-niu/cloudreve-docker#docker-compose%E6%96%B9%E5%BC%8F%E8%BF%90%E8%A1%8C)
 
 * Set the environment variables in .env file (sample: dot.env)
@@ -11,3 +12,7 @@
   * Temporary donwload folder: /downloads (match with the dir in the docker-compose file)
   * Test the connection, save if pass.
 * Set the reverse proxy accordingly (not included here)
+
+## Aria2 config
+* max-tries=5
+* max-concurrent-downloads=10
