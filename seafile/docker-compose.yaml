@@ -50,9 +50,6 @@ services:
       # http://{seafile host ip}/onlyofficeds/welcome:{port}
       - 20080:80
 
-    depends_on:
-      - seafile
-
     networks:
       seafile-net:
         # Must match with seafile.nginx.conf.template OnlyOffice's proxy_pass address
@@ -101,6 +98,7 @@ services:
       - letsencrypt-companion
       - proxy
       - elasticsearch
+      - onlyoffice
     networks:
       - seafile-net
       - proxy-net
