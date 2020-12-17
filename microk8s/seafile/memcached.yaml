@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: seafile-memcached
+  name: seafile-memcached
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seafile-memcached
+  template:
+    metadata:
+      labels:
+        app: seafile-memcached
+    spec:
+      nodeSelector:
+        host_seafile: "true"
+      containers:
+      - command:
+        - memcached
+        - -m
+        - "256"
+        image: memcached:1.5.6
+        name: seafile-memcached
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: seafile-memcached
+  name: memcached
+spec:
+  ports:
+  - name: "11211"
+    port: 11211
+    targetPort: 11211
+  selector:
+    app: seafile-memcached
+  type: ClusterIP

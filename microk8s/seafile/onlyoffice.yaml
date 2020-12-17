@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: seafile-onlyoffice
+  name: seafile-onlyoffice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seafile-onlyoffice
+  template:
+    metadata:
+      labels:
+        app: seafile-onlyoffice
+    spec:
+      nodeSelector:
+        use: worker
+      containers:
+      - image: onlyoffice/documentserver
+        name: seafile-onlyoffice
+        resources:
+          limits:
+            memory: "2147483648"
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: seafile-onlyoffice
+  name: onlyofficeserver
+spec:
+  ports:
+  - name: "80"
+    port: 80
+    targetPort: 80
+  selector:
+    app: seafile-onlyoffice
+  type: ClusterIP

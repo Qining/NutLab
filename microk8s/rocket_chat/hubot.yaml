@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: rocketchat
+  name: hubot-cred
+type: Opaque
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: rocketchat
+  labels:
+    app: hubot
+  name: hubot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hubot
+  template:
+    metadata:
+      labels:
+        app: hubot
+    spec:
+      nodeSelector:
+        host_rocketchat: "true"
+      containers:
+      - name: hubot
+        image: rocketchat/hubot-rocketchat:latest
+        volumeMounts:
+          - name: hubot-files
+            mountPath: /home/hubot/scripts
+        ports:
+          - containerPort: 8080
+        env:
+          - name: ROCKETCHAT_URL
+            value: "rocketchat:3000"
+          - name: ROCKETCHAT_ROOM
+            value: "GENERAL"
+          - name: ROCKETCHAT_USER
+            value: "bot"
+          - name: ROCKETCHAT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: hubot-cred
+                key: password
+          - name: BOT_NAME
+            value: "bot"
+          - name: EXTERNAL_SCRIPTS
+            value: "hubot-help,hubot-seen,hubot-links,hubot-diagnostics"
+      restartPolicy: Always
+      volumes:
+        - name: hubot-files
+          hostPath:
+            path: /hubot-files
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: rocketchat
+  labels:
+    app: hubot
+  name: hubot
+spec:
+  ports:
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: hubot
+  type: ClusterIP

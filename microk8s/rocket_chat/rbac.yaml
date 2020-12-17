@@ -1,0 +1,35 @@
+# "system:serviceaccount:rocketchat:default"
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: mongo-sidecar
+rules:
+  - apiGroups:
+    - ""
+    resources:
+      - pods
+      - services
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default
+  namespace: rocketchat
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: mongo-sidecar
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: rocketchat
+roleRef:
+  kind: ClusterRole
+  name: mongo-sidecar
+  apiGroup: rbac.authorization.k8s.io

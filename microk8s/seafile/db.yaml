@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: seafile-db-cred
+type: Opaque
+data:
+  # password is `echo -n "changeme" | base64`
+  password: Y2hhbmdlbWU=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: seafile-db
+  name: seafile-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seafile-db
+  template:
+    metadata:
+      labels:
+        app: seafile-db
+    spec:
+      nodeSelector:
+        host_seafile: "true"
+      containers:
+      - env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: seafile-db-cred
+              key: password
+        image: mariadb:10.1
+        name: seafile-db
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: seafile-db-files
+      restartPolicy: Always
+      volumes:
+      - name: seafile-db-files
+        hostPath:
+          path: /seafile-db-files
+          type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: seafile-db
+  name: seafile-db
+spec:
+  ports:
+  - name: "3306"
+    port: 3306
+    targetPort: 3306
+  selector:
+    app: seafile-db
+  type: ClusterIP

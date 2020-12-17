@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: rocketchat
+  labels:
+    app: rocketchat
+  name: rocketchat
+spec:
+  selector:
+    matchLabels:
+      app: rocketchat
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rocketchat
+    spec:
+      nodeSelector:
+        host_rocketchat: "true"
+      containers:
+      - name: rocketchat
+        image: rocketchat/rocket.chat:latest
+        volumeMounts:
+          - name: rocketchat-files
+            mountPath: /app/uploads
+        env:
+        - name: ROOT_URL
+          value: "https://rocketchat.example.org"
+        - name: MONGO_URL
+          value: "mongodb://mongo-db-0.mongo.rocketchat.svc.cluster.local:27017/rocketchat"
+        - name: MONGO_OPLOG_URL
+          value: "mongodb://mongo-db-0.mongo.rocketchat.svc.cluster.local:27017/local?replicaSet=rs0"
+        ports:
+        - containerPort: 3000
+      restartPolicy: Always
+      volumes:
+        - name: rocketchat-files
+          hostPath:
+            path: /rocketchat-files
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: rocketchat
+  labels:
+    app: rocketchat
+  name: rocketchat
+spec:
+  ports:
+  - name: "3000"
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: rocketchat
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: rocketchat
+  name: rocketchat
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  tls:
+  - hosts:
+    - rocketchat.example.org
+    secretName: rocketchat.example.org
+  rules:
+    - host: rocketchat.example.org
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: rocketchat
+            servicePort: 3000
