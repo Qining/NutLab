@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  jellyfin:
+    build: ./jellyfin
+    restart: always
+    volumes:
+      - ${CONFIG_DIR}:/config
+      - ${DATA_DIR}:/data
+    environment:
+      - TIME_ZONE=US/Eastern
+      - PUID=${PUID}
+      - PGID=${PGID}
+    ports:
+      - 8096:8096
+      - 7359:7359/udp
+      - 1900:1900/udp
+    env_file:
+      - .env
